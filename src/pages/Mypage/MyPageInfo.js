@@ -16,7 +16,6 @@ import { useNavigate } from "react-router-dom";
 import { CustomTheme } from "../../assets/Theme/CustomTheme";
 import { MYPAGE } from "../../constants/PageURL";
 import axios from "axios";
-const noProfile = "/images/emptyProfile.png";
 function MyInfo() {
   const navigate = useNavigate();
   const [data, setData] = useState();
@@ -71,7 +70,7 @@ function MyInfo() {
                   <Box display={"flex"} justifyContent={"center"} m={4}>
                     <Avatar
                       alt="profile"
-                      src={data && data.memberImg ? data.memberImg : noProfile}
+                      src={data && data.memberImg}
                       sx={{ width: 200, height: 200 }}
                     />
                   </Box>

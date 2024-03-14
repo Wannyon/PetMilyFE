@@ -276,7 +276,8 @@ function ModifyInfo() {
       console.log("Error >>", err);
     }
     //이미지 업로드
-    let imageUrl = "https://via.placeholder.com/150";
+    let imageUrl = Image;
+    //"https://via.placeholder.com/150";
     if (file) {
       const uploadedUrl = await uploadImage(file);
       if (uploadedUrl) {

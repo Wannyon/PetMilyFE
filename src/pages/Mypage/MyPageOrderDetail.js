@@ -11,49 +11,68 @@ import {
 } from "@mui/material";
 import { CustomTheme } from "../../assets/Theme/CustomTheme";
 import { useNavigate, useParams } from "react-router-dom";
-import { BROWSER_PATH } from "../../constants/path";
-import { MYPAGE } from "../../constants/PageURL";
+import { MYPAGE, SHOP } from "../../constants/PageURL";
 import { useEffect, useState } from "react";
+import axios from "axios";
+import dayjs from "dayjs";
+import LoadingPage from "../Loading/LoadingPage";
 
 const MyPageOrderDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [orderData, setOrderData] = useState({
-    orderNum: null,
-    productName: null,
-    cost: null,
-    quantity: null,
-    orderDate: null,
-    orderState: null,
-    productImg: null,
-    address: null,
-    note: null,
-    recipient: null,
-    recipientTel: null,
-    postal: null,
-    detailAddr: null,
-  });
-  const [payData, setPayData] = useState({
-    paymentNum: null,
-    orderNum: null,
-    merchantUid: null, // 결제코드
-    impUid: null, // 아임포트 uid
-    paymentState: null,
-    amount: null, // 결제금액
-    paymentDate: null,
-    paymentMethod: null,
-  });
+  const [orderData, setOrderData] = useState({});
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    setOrderData({
-      ...orderlist.filter((data) => data.orderNum === parseInt(id))[0],
-    });
-    setPayData({
-      ...payment.filter((data) => data.orderNum === parseInt(id))[0],
-    });
+    setIsLoaded(false);
+    axios
+      .get("/mypage/orderlist/detail/" + id)
+      .then((response) => {
+        console.log(response.data);
+        setOrderData(response.data);
+        setIsLoaded(true);
+      })
+      .catch((error) => {
+        console.error("에러발생:", error);
+      });
   }, [id]);
-  useEffect(() => {}, [orderData]);
-  return (
+
+  const [payMethod, setPayMethod] = useState("No Data");
+
+  useEffect(() => {
+    if (orderData && orderData.merchantUid) {
+      const match = orderData.merchantUid.match(/-(.)-/);
+      let char;
+      if (match) {
+        char = match[1];
+      }
+      switch (char) {
+        case "K":
+          setPayMethod("카카오페이");
+          break;
+        case "V":
+          setPayMethod("계죄이체");
+          break;
+        case "C":
+          setPayMethod("카드결제");
+          break;
+        default:
+          setPayMethod("No Data");
+          break;
+      }
+    }
+  }, [orderData]);
+
+  // useEffect(() => {
+  //   setOrderData({
+  //     ...orderlist.filter((data) => data.orderNum === parseInt(id))[0],
+  //   });
+  //   setPayData({
+  //     ...payment.filter((data) => data.orderNum === parseInt(id))[0],
+  //   });
+  // }, [id]);
+  // useEffect(() => {}, [orderData]);
+  return isLoaded && orderData ? (
     <ThemeProvider theme={CustomTheme}>
       <Typography
         className="myOrderListTitle"
@@ -64,13 +83,16 @@ const MyPageOrderDetail = () => {
       >
         주문 상세
       </Typography>
-      <Box p={2} border={1} borderRadius={2} borderColor="fbd385.main">
+      <Box p={2} border={1} borderRadius={2} borderColor="primary.main">
         <Table size="small" padding="normal">
           <TableHead>
             <TableRow>
               <TableCell colSpan={4}>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Box sx={thSx}>주문날짜: {orderData.orderDate}</Box>
+                  <Box sx={thSx}>
+                    주문날짜:{" "}
+                    {dayjs(orderData.orderDate).format("YYYY-MM-DD HH:mm:ss")}
+                  </Box>
                   <Box sx={{ ...thSx, color: "#1976d2" }} width={"100px"}>
                     {orderData.orderState}
                   </Box>
@@ -82,10 +104,12 @@ const MyPageOrderDetail = () => {
             <TableRow>
               <TableCell width={"200px"}>
                 <img
-                  src={orderData.productImg}
+                  src={orderData.imgThumbnail}
                   alt="noImg"
                   height={"200px"}
-                  onClick={() => navigate(BROWSER_PATH.MYPAGE)}
+                  onClick={() =>
+                    navigate(SHOP.PRODUCT_DETAIL(orderData.boardNum))
+                  }
                 />
               </TableCell>
               <TableCell sx={{ ...tdSx, flexGrow: 1 }}>
@@ -109,9 +133,9 @@ const MyPageOrderDetail = () => {
           <TableBody>
             <TableRow>
               <TableCell sx={{ ...tdSx, p: 2 }} colSpan={4}>
-                이름: {member.name}
+                이름: {orderData.memberName}
                 <br />
-                연락처: {member.tel}
+                연락처: {orderData.memberTel}
               </TableCell>
             </TableRow>
           </TableBody>
@@ -125,13 +149,14 @@ const MyPageOrderDetail = () => {
           <TableBody>
             <TableRow>
               <TableCell sx={{ ...tdSx, p: 2 }} colSpan={4}>
-                결제코드: {payData.merchantUid}
+                결제코드: {orderData.merchantUid}
                 <br />
-                결제금액: {parseInt(payData.amount).toLocaleString()} 원
+                결제금액: {parseInt(orderData.amount).toLocaleString()} 원
                 <br />
-                결제수단: {payData.paymentMethod}
+                결제수단: {payMethod}
                 <br />
-                결제일자: {payData.paymentDate}
+                결제일자:{" "}
+                {dayjs(orderData.paymentDate).format("YYYY-MM-DD HH:mm:ss")}
               </TableCell>
             </TableRow>
           </TableBody>
@@ -153,7 +178,7 @@ const MyPageOrderDetail = () => {
                 <br />
                 주소: {orderData.address}
                 <br />
-                상세주소: {orderData.detailAddr}
+                상세주소: {orderData.addressDetail}
                 <br />
                 배송 메모: {orderData.note}
               </TableCell>
@@ -172,6 +197,8 @@ const MyPageOrderDetail = () => {
         </Box>
       </Box>
     </ThemeProvider>
+  ) : (
+    <LoadingPage />
   );
 };
 

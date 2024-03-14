@@ -5,12 +5,11 @@ import { MYPAGE } from "../../constants/PageURL";
 import axios from "axios";
 import { Avatar } from "@mui/material";
 
-const noProfile = "/images/emptyProfile.png";
 const MyPageNav = () => {
   const [member, setMember] = useState({
     memberNum: null,
     memberNickname: "",
-    memberImg: noProfile,
+    memberImg: "",
   });
 
   useState(() => {

@@ -25,9 +25,8 @@ const HeaderRight = ({ page }) => {
         .catch((error) => {
           console.error("데이터 수신 오류 :", error);
         });
-    };
+    }
   }, [userNum]);
-
 
   // 마이페이지 버튼
   const myPageClick = () => {
@@ -62,8 +61,8 @@ const HeaderRight = ({ page }) => {
 
   // 관리자 페이지 버튼
   const adminClick = () => {
-    return navigate("/a");  // 관리자 페이지로 이동.
-  }
+    return navigate("/a"); // 관리자 페이지로 이동.
+  };
 
   // 로그인 상태일때
   if (loggedIn === true) {
@@ -81,7 +80,7 @@ const HeaderRight = ({ page }) => {
                 color: "#FFFFFF",
                 background: "#FF8282",
                 borderColor: "#FF8282",
-                ":hover": { borderColor: "#ED4F4F", background: "#ED4F4F" },
+                ":hover": { borderColor: "#B25B5B", background: "#B25B5B" },
               }}
             >
               로그아웃
@@ -104,8 +103,7 @@ const HeaderRight = ({ page }) => {
           </Stack>
         </HeadrRight>
       );
-    }
-    else {
+    } else {
       return (
         <HeadrRight className="headright">
           <Stack className="stack" spacing={2} direction="row">
@@ -119,7 +117,7 @@ const HeaderRight = ({ page }) => {
                 color: "#FFFFFF",
                 background: "#FF8282",
                 borderColor: "#FF8282",
-                ":hover": { borderColor: "#ED4F4F", background: "#ED4F4F" },
+                ":hover": { borderColor: "#B25B5B", background: "#B25B5B" },
               }}
             >
               로그아웃
@@ -133,7 +131,7 @@ const HeaderRight = ({ page }) => {
                 color: "#FFFFFF",
                 background: "#FBD385",
                 borderColor: "#FBD385",
-                ":hover": { borderColor: "#FFBE3F", background: "#FFBE3F" },
+                ":hover": { borderColor: "#AF935D", background: "#AF935D" },
               }}
             >
               {" "}
@@ -160,7 +158,7 @@ const HeaderRight = ({ page }) => {
               minWidth: "100",
               background: "#BFBFBF",
               borderColor: "#BFBFBF",
-              ":hover": { borderColor: "gray", background: "gray" },
+              ":hover": { borderColor: "#858585", background: "#858585" },
             }}
           >
             회원가입
@@ -174,7 +172,7 @@ const HeaderRight = ({ page }) => {
               color: "#FFFFFF",
               background: "#FBD385",
               borderColor: "#FBD385",
-              ":hover": { borderColor: "#FFBE3F", background: "#FFBE3F" },
+              ":hover": { borderColor: "#AF935D", background: "#AF935D" },
             }}
           >
             로그인

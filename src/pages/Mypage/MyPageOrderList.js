@@ -4,50 +4,50 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { CustomTheme } from "../../assets/Theme/CustomTheme";
-import { ThemeProvider, Typography, Box, Button } from "@mui/material";
+import { ThemeProvider, Typography, Box, Button, Grid } from "@mui/material";
 import SearchBar from "../../components/common/SearchBar";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { CustomDatePicker } from "../../components/common/CustomDatePicker";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
-import { MYPAGE } from "../../constants/PageURL";
+import { MYPAGE, SHOP } from "../../constants/PageURL";
+import axios from "axios";
 
 const MyPageOrderList = () => {
   const pageLimit = 10;
   const navigate = useNavigate();
-  const [startDate, setStartDate] = useState(
-    dayjs(dayjs().subtract(6, "month").startOf("date").toDate())
-  );
-  const [endDate, setEndDate] = useState(dayjs().endOf("date"));
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [queryData, setQueryData] = useState(orderlist);
-  const [dateList, setDateList] = useState([
-    ...new Set(orderlist.map((product) => product.orderDate)),
-  ]);
-  const resetDate = () => {
-    setStartDate(dayjs(dayjs().subtract(6, "month").startOf("date").toDate()));
-    setEndDate(dayjs().endOf("date"));
-  };
+  // const [startDate, setStartDate] = useState(
+  //   dayjs(dayjs().subtract(6, "month").startOf("date").toDate())
+  // );
+  // const [endDate, setEndDate] = useState(dayjs().endOf("date"));
+  const [search, setSearch] = useState("");
+  const [keyword, setKeyword] = useState("");
+  const [queryData, setQueryData] = useState([]);
+  const [dateList, setDateList] = useState([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [showMore, setShowMore] = useState(true);
+  // const resetDate = () => {
+  //   setStartDate(dayjs(dayjs().subtract(6, "month").startOf("date").toDate()));
+  //   setEndDate(dayjs().endOf("date"));
+  // };
   // 검색에 따른 데이터 조회
   useEffect(() => {
-    searchKeyword && console.log(searchKeyword);
-    console.log(
-      startDate.format("YYYY-MM-DD"),
-      startDate,
-      endDate.format("YYYY-MM-DD"),
-      endDate
-    );
-    setQueryData(
-      orderlist.filter(
-        (data) =>
-          data.productName.includes(searchKeyword) &&
-          dayjs(data.orderDate) >= startDate &&
-          dayjs(data.orderDate) <= endDate
-      )
-    );
-  }, [startDate, endDate, searchKeyword]);
-
+    showMore &&
+      axios
+        .get("/mypage/orderlist/list?page=" + page + "&search=" + search)
+        .then((response) => {
+          setQueryData([...queryData, ...response.data.content]);
+          setPage(response.data.number + 1);
+          setTotalPages(response.data.totalPages);
+          setShowMore(false);
+          console.log("useEffect", response.data);
+        });
+  }, [showMore]);
+  useEffect(() => {
+    console.log(search);
+  });
   // 검색결과에 따른 날짜리스트 변경
   useEffect(() => {
     setDateList([
@@ -58,9 +58,17 @@ const MyPageOrderList = () => {
       ),
     ]);
   }, [queryData]);
-  const ShowMore = () => {};
+  useEffect(() => {
+    console.log("변경사항:", queryData, page, totalPages, showMore, dateList);
+  }, [dateList]);
+  const handleSearchClick = () => {
+    setQueryData([]);
+    setSearch(keyword);
+    setPage(0);
+    setShowMore(true);
+  };
 
-  return (
+  return totalPages !== 0 ? (
     <ThemeProvider theme={CustomTheme}>
       <Typography
         className="myOrderListTitle"
@@ -74,10 +82,10 @@ const MyPageOrderList = () => {
       <Box
         sx={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
         }}
       >
-        <Box display={"flex"}>
+        {/* <Box display={"flex"}>
           <CustomDatePicker
             label="Start Date"
             defaultValue={dayjs(startDate)}
@@ -105,10 +113,11 @@ const MyPageOrderList = () => {
           >
             <AutorenewIcon onClick={resetDate} />
           </Button>
-        </Box>
+        </Box> */}
         <SearchBar
-          setValue={setSearchKeyword}
-          value={searchKeyword}
+          setValue={setKeyword}
+          value={keyword}
+          onClick={handleSearchClick}
           width={"250px"}
         />
       </Box>
@@ -128,7 +137,7 @@ const MyPageOrderList = () => {
                 mb={2}
                 lineHeight={1.5}
               >
-                {date}
+                {dayjs(date).format("YYYY-MM-DD")}
               </Box>
               <Table size="small" padding="normal" sx={{ minWidth: "800px" }}>
                 <TableHead>
@@ -153,10 +162,12 @@ const MyPageOrderList = () => {
                       <TableRow key={index2}>
                         <TableCell sx={tdSx}>
                           <img
-                            src={row.productImg}
+                            src={row.imgThumbnail}
                             alt="noImg"
                             height={"100px"}
-                            onClick={() => navigate(MYPAGE.INFO)}
+                            onClick={() =>
+                              navigate(SHOP.PRODUCT_DETAIL(row.boardNum))
+                            }
                           />
                         </TableCell>
                         <TableCell sx={tdSx}>{row.productName}</TableCell>
@@ -164,17 +175,14 @@ const MyPageOrderList = () => {
                           {parseInt(row.quantity).toLocaleString()}
                         </TableCell>
                         <TableCell sx={tdSx}>
-                          {(
-                            parseInt(row.cost) * parseInt(row.quantity)
-                          ).toLocaleString()}
-                          원
+                          {parseInt(row.cost).toLocaleString()}원
                         </TableCell>
                         <TableCell sx={tdSx}>{row.orderState}</TableCell>
                         <TableCell sx={tdSx}>
                           <Button
                             variant="contained"
                             onClick={() =>
-                              navigate(MYPAGE.ORDER_DETAIL(row.orderNum))
+                              navigate(MYPAGE.ORDER_DETAIL(row.orderlistNum))
                             }
                           >
                             상세보기
@@ -188,13 +196,31 @@ const MyPageOrderList = () => {
           </Box>
         );
       })}
-      {dateList.length === pageLimit && (
+      {totalPages >= page && (
         <Box mt={5} sx={{ display: "flex", justifyContent: "center" }}>
-          <Button align="center" onClick={ShowMore}>
+          <Button align="center" onClick={() => setShowMore(true)}>
             상품 더보기
           </Button>
         </Box>
       )}
+    </ThemeProvider>
+  ) : (
+    <ThemeProvider theme={CustomTheme}>
+      <Grid sx={{ width: "940px", height: "50vh" }}>
+        <Table
+          aria-label="caption table"
+          overflow="hidden"
+          sx={{ border: "1px solid lightgray" }}
+        >
+          <TableHead>
+            <TableRow>
+              <TableCell colSpan={4} align="center" sx={{ height: 250 }}>
+                주문 내역이 존재하지 않습니다.
+              </TableCell>
+            </TableRow>
+          </TableHead>
+        </Table>
+      </Grid>
     </ThemeProvider>
   );
 };

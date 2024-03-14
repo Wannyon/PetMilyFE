@@ -162,6 +162,7 @@ const DonateApply = () => {
       setErrorMsg(error_msg);
       setDonationCompleted(true);
       setIsSuccess(false);
+      window.scrollTo(0, 0);
     }
   }
 

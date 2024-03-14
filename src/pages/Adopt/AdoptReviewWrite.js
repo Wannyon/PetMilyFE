@@ -106,7 +106,7 @@ const AdoptReviewWrite = () => {
           reviewDate: isoCurrentDate,
         })
         .then(() => {
-          alert("등록완료");
+          // alert("등록완료");
           document.location.href = ADOPT.REVIEW;
         });
       setFormAble(true);
@@ -265,7 +265,7 @@ const WriteButton = styled(Button)`
     margin-top: 10px;
     margin-left: auto;
     &:hover {
-      background-color: #AF935D;
+      background-color: #af935d;
     }
   }
 `;

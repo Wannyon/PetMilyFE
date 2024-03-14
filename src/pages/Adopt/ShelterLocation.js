@@ -434,7 +434,8 @@ const ShelterLocation = () => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              marginTop: "15px",
+              marginTop: "25px",
+              marginBottom: "25px",
             }}
           ></Grid>
         </Box>

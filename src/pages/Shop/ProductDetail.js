@@ -66,7 +66,6 @@ const ProductDetail = () => {
       memberId: sessionStorage.getItem("id"),
       productName: products.productName,
       productCost: products.productCost,
-      imgThumbnail: products.imgThumbnail,
       quantity: quantity,
     });
   };

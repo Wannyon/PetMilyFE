@@ -227,7 +227,9 @@ const HospitalLocation = () => {
             height: "500px",
           }}
         ></div>
-        <Box sx={{ marginTop: "30px", marginLeft: "16px" }}>
+        <Box
+          sx={{ marginTop: "30px", marginLeft: "16px", marginBottom: "60px" }}
+        >
           <Grid
             container
             spacing={2}
